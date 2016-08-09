@@ -9,6 +9,9 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/console/parse.h>
 
+#include <pcl/range_image/range_image_spherical.h>
+#include <pcl/io/png_io.h>
+#include <pcl/visualization/common/float_image_utils.h>
 typedef pcl::PointXYZ PointType;
 
 // --------------------
@@ -39,7 +42,7 @@ printUsage (const char* progName)
 void 
 setViewerPose (pcl::visualization::PCLVisualizer& viewer, const Eigen::Affine3f& viewer_pose)
 {
-  Eigen::Vector3f pos_vector = viewer_pose * Eigen::Vector3f(0, 0, 0);
+  Eigen::Vector3f pos_vector = viewer_pose * Eigen::Vector3f(2, 0, 1);
   Eigen::Vector3f look_at_vector = viewer_pose.rotation () * Eigen::Vector3f(0, 0, 1) + pos_vector;
   Eigen::Vector3f up_vector = viewer_pose.rotation () * Eigen::Vector3f(0, -1, 0);
   viewer.setCameraPosition (pos_vector[0], pos_vector[1], pos_vector[2],
@@ -120,12 +123,12 @@ main (int argc, char** argv)
   float noise_level = 0.0;
   float min_range = 0.0f;
   int border_size = 1;
-  boost::shared_ptr<pcl::RangeImage> range_image_ptr(new pcl::RangeImage);
-  pcl::RangeImage& range_image = *range_image_ptr;   
+  boost::shared_ptr<pcl::RangeImageSpherical> range_image_ptr(new pcl::RangeImageSpherical);
+  pcl::RangeImageSpherical& range_image = *range_image_ptr;
   range_image.createFromPointCloud (point_cloud, angular_resolution_x, angular_resolution_y,
                                     pcl::deg2rad (360.0f), pcl::deg2rad (180.0f),
                                     scene_sensor_pose, coordinate_frame, noise_level, min_range, border_size);
-  
+
   // --------------------------------------------
   // -----Open 3D viewer and add point cloud-----
   // --------------------------------------------
@@ -143,6 +146,12 @@ main (int argc, char** argv)
   // --------------------------
   // -----Show range image-----
   // --------------------------
+  //added!!!!!
+  scene_sensor_pose = viewer.getViewerPose();
+  range_image.createFromPointCloud (point_cloud, angular_resolution_x, angular_resolution_y,
+                                    pcl::deg2rad (180.0f), pcl::deg2rad (90.0f),
+                                    scene_sensor_pose, pcl::RangeImageSpherical::LASER_FRAME, noise_level, min_range, border_size);
+
   pcl::visualization::RangeImageVisualizer range_image_widget ("Range image");
   range_image_widget.showRangeImage (range_image);
   
