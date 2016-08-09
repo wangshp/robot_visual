@@ -155,6 +155,10 @@ main (int argc, char** argv)
   pcl::visualization::RangeImageVisualizer range_image_widget ("Range image");
   range_image_widget.showRangeImage (range_image);
   
+  float* ranges = range_image.getRangesArray ();
+  unsigned char* rgb_image = pcl::visualization::FloatImageUtils::getVisualImage (ranges, range_image.width, range_image.height);
+  pcl::io::saveRgbPNGFile("range_image.png", rgb_image, range_image.width, range_image.height);
+
   //--------------------
   // -----Main loop-----
   //--------------------
